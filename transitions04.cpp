@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#include "/home/marisa/Vídeos/verificador_simbolico/cudd-3.0.0/util/util.h"
-#include "/home/marisa/Vídeos/verificador_simbolico/cudd-3.0.0/cudd/cudd.h"
+#include "cudd-3.0.0/util/util.h"
+#include "cudd-3.0.0/cudd/cudd.h"
 
  
 using namespace std;
@@ -73,7 +73,7 @@ vector<string> createPropositions() {
     vector<string>names;
     int i = 0, count  = 0;
  
-   file.open("/home/marisa/Vídeos/verificador_simbolico/modelo.txt",ios::in | ios::binary); // abre o arquivo: Obs(segundo e terceiro parametros são um misterio).
+   file.open("modelo.txt",ios::in | ios::binary); // abre o arquivo: Obs(segundo e terceiro parametros são um misterio).
  
  
     if (file.is_open()){
@@ -148,7 +148,7 @@ void createStates(vector<string>names) {
     int i = 0, j = 0;
     DdNode * aux;
 
-    file.open("/home/marisa/Vídeos/verificador_simbolico/modelo.txt",ios::in | ios::binary);
+    file.open("modelo.txt",ios::in | ios::binary);
  
     if (file.is_open()) {
         while(line.compare("<states>") != 0 ) {
@@ -208,7 +208,7 @@ void createTransitions(int *permutation) {
     string line;
     ifstream file;
 
-    file.open("/home/marisa/Vídeos/verificador_simbolico/modelo.txt",ios::in | ios::binary);
+    file.open("modelo.txt",ios::in | ios::binary);
     if (file.is_open()) {
         while(line.compare("<transitions>") != 0 ) {
             getline(file, line);
@@ -286,7 +286,7 @@ int main(){
     char *nome[prop.size()];
 
     print_dd(gbm, Tdd, 8,4);
-    sprintf(filename, "/home/marisa/Vídeos/verificador_simbolico/bdd/graph.dot");
+    sprintf(filename, "bdd/graph.dot");
     write_dd(gbm, Tdd, filename);
     Cudd_Quit(gbm);
  

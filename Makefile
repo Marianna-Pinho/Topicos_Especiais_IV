@@ -1,5 +1,5 @@
-CFLAGS = -I  /home/marisa/Vídeos/verificador_simbolico/cudd-3.0.0 cudd-3.0.0/cudd -I /home/marisa/Vídeos/verificador_simbolico/cudd-3.0.0/util -I /home/marisa/Vídeos/verificador_simbolico/cudd-3.0.0
-LFLAGS = -static -L /home/marisa/Vídeos/verificador_simbolico/cudd-3.0.0/cudd/.libs/ -lcudd -lm
+CFLAGS = -I  cudd-3.0.0 cudd-3.0.0/cudd -I cudd-3.0.0/util -I /cudd-3.0.0
+LFLAGS = -static -L cudd-3.0.0/cudd/.libs/ -lcudd -lm
 
 teste = transitions04
 ext =  cpp

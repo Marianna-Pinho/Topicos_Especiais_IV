@@ -246,7 +246,7 @@ int main(){
  
     char filename[100];
     gbm = Cudd_Init(0,0,CUDD_UNIQUE_SLOTS,CUDD_CACHE_SLOTS,0);
-    DdNode *Xdd,*Tdd;
+    DdNode *Xdd,*Tdd, *print;
     int i = 0;
 
  
@@ -284,10 +284,11 @@ int main(){
   /* **************** Saving Bdd *************** */
     i = 0;
     char *nome[prop.size()];
+    print = Cudd_BddToAdd(gbm,Tdd);
 
-    print_dd(gbm, Tdd, 8,4);
+    print_dd(gbm, print, 8,4);
     sprintf(filename, "bdd/graph.dot");
-    write_dd(gbm, Tdd, filename);
+    write_dd(gbm, print, filename);
     Cudd_Quit(gbm);
  
      return 0;

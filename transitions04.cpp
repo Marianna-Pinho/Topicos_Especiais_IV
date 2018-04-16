@@ -246,9 +246,8 @@ int main(){
  
     char filename[100];
     gbm = Cudd_Init(0,0,CUDD_UNIQUE_SLOTS,CUDD_CACHE_SLOTS,0);
-    DdNode *Xdd,*Tdd, *print;
+    DdNode *Xdd,*Tdd, *print, *restrictBy, *restrictNot, *restrictF, *XTdd, *preFraca, *Xddl;
     int i = 0;
-
  
  /* ********** Creating Propositions ********* */
     names = createPropositions();
@@ -281,10 +280,76 @@ int main(){
         Cudd_Ref(Tdd);       
     }
    
-  /* **************** Saving Bdd *************** */
+
+/* ********************** Seting Pairs ****************** */
+    // for(i = 0; i < (int)prop.size(); i++){
+    //     if(!Cudd_bddSetPairIndex(gbm, i, i+1)){
+    //         printf("Pair didn't set \n");
+    //     }
+    // }
+
+/* ************************ Creating X'dd *************** */
+    Xddl = Cudd_bddPermute(gbm, Xdd, permutation); 
+       if(Xddl == NULL){
+            printf("Permute failed\n");
+       }
+
+/* ******************* Applying EX ********************** */
+    // aux = trans[0];
+    // for (i = 0; i < 23; i++) {           //Fazendo o Ou entre todas as transições
+    //     Tdd = Cudd_bddOr(gbm,trans[i+1],aux);
+    //     Cudd_Ref(Tdd);
+    //     Cudd_RecursiveDeref(gbm,aux);
+    //     aux = Tdd;
+    // }
+    // Cudd_RecursiveDeref(gbm,aux);
+    // DdNode *teste =  aux->second;
+    XTdd = Cudd_bddAnd(gbm, Xddl, Tdd);
     i = 0;
-    char *nome[prop.size()];
-    print = Cudd_BddToAdd(gbm,Tdd);
+    map<string, DdNode*>::iterator aux = prop.begin();
+    aux++;
+    restrictBy = aux->second;   //Fazemos isso para pegar o primeiro linha
+    restrictNot = Cudd_Not(aux->second);
+    restrictF = Cudd_bddOr(gbm, restrictBy, restrictNot);
+    preFraca = XTdd;
+    print = Cudd_BddToAdd(gbm,preFraca);
+    print_dd(gbm, print, 8,4);
+    for(map<string, DdNode*>::iterator it = prop.begin(); it != prop.end(); it++){ //Fazendo a AND entre todos os linha
+        if((i%2)){  //Se i for uma posição ímpar, que é onde estão os linha
+            // restrictBy = it->second;
+            // preFraca = Cudd_bddRestrict(gbm, preFraca, restrictBy);
+            // print = Cudd_BddToAdd(gbm,preFraca);
+            // print_dd(gbm, print, 8,4);
+            // cout << "\n" << endl;
+          // restrictBy = Cudd_bddAnd(gbm, restrictBy, it->second); 
+          // Cudd_Ref(restrictBy);
+            preFraca = Cudd_bddOr(gbm, Cudd_bddRestrict(gbm, preFraca, it->second), Cudd_bddRestrict(gbm, preFraca, Cudd_Not(it->second)));
+            print = Cudd_BddToAdd(gbm,preFraca);
+            print_dd(gbm, print, 8,4);
+            cout << "\n" << endl;
+        }
+        i++;
+    }
+        
+    // XTdd = or(restrict(XTdd, it->second), restrict(XTdd, not(it->second)))
+    // // DdNode *teste =  aux->second;
+    //  XTdd = Cudd_bddAnd(gbm, Xddl, Tdd);
+    //  preFraca = Cudd_bddRestrict(gbm, XTdd, restrictF);
+
+     // DdNode *teste =  aux->second;
+    // XTdd = Cudd_bddAnd(gbm, Xddl, Tdd);
+    // preFraca = Cudd_bddRestrict(gbm, XTdd, teste);
+    // aux++;
+    // teste = aux->second;
+    // DdNode *preFraca2 = Cudd_bddRestrict(gbm, XTdd, teste);
+
+  /* **************** Saving Bdd *************** */
+    // i = 0;
+    // char *nome[prop.size()];
+    // for(i = 0; i < prop.size(); i++){
+    //     strcpy(nome[i],);
+    // }
+    print = Cudd_BddToAdd(gbm,preFraca);
 
     print_dd(gbm, print, 8,4);
     sprintf(filename, "bdd/graph.dot");
@@ -293,3 +358,11 @@ int main(){
  
      return 0;
 }
+
+
+
+
+
+
+
+

@@ -95,6 +95,7 @@ vector<string> createPropositions() {
             prop[names[count+1]] = Cudd_bddIthVar(gbm,count+1);
             Cudd_Ref(prop[names[count+1]]);
 
+            //Setando os pares
             if(!Cudd_bddSetPairIndex(gbm, i, i+1)){
                printf("Pair didn't set \n");
            }
@@ -162,8 +163,8 @@ void createStates(vector<string>names) {
  
     while (line.compare("<\\states>") != 0) {
         j = 0;
+
         string nomeState = getWord(line, ':');
- 
         vector<string> ps{splits(line.substr(nomeState.size()+1,line.length()-1), ',')};
         vector<string> notStates = compara(names, ps);
         
@@ -253,11 +254,9 @@ DdNode *pre_Forte(DdNode* Sdd, DdNode* Xdd, DdNode* Tdd, int *permutation){
 DdNode *satEG(DdNode *phi, DdNode *Sdd, DdNode *Tdd, int *permutation){
 	DdNode *x = Sdd;
 	DdNode *y = phi;
-	DdNode *print, *aux;
 
 	while(x != y){
 		x = y;
-		aux = pre_Fraca(y, Tdd, permutation);
 		y = Cudd_bddAnd(gbm, y, pre_Fraca(y, Tdd, permutation));
 	}
 	return y;	
@@ -318,7 +317,7 @@ int main(){
  DdNode * entrada = prop["q"];
  //DdNode * entrada = Cudd_Not(prop["r"]);
 
- //entrada = Cudd_bddAnd(gbm, entrada, prop["q"]);
+// entrada = Cudd_bddAnd(gbm, entrada, prop["q"]);
 // entrada = Cudd_bddAnd(gbm, entrada, Cudd_Not(prop["q"]));
 // entrada = Cudd_bddOr(gbm, entrada, prop["q"]);
  //entrada = Cudd_bddOr(gbm, entrada, Cudd_Not(prop["q"]));
@@ -335,16 +334,17 @@ int main(){
 
 
 //Cálculo da Pré-Fraca
- preFraca = pre_Fraca(states["s8"], Tdd, permutation);
+ preFraca = pre_Fraca(entrada, Tdd, permutation);
 
 //Cálculo da Pré-Forte
- preForte = pre_Forte(Xdd, states["s8"], Tdd, permutation);
+ preForte = pre_Forte(Xdd, entrada, Tdd, permutation);
      
-
-//Imprimindo e salvando Bdd
+//Calculando auxiliares
 sEG = satEG(entrada, Xdd, Tdd, permutation); 
 sAX = satAX(entrada, Xdd, Tdd, permutation);
-print = Cudd_BddToAdd(gbm,sAX);
+
+//Imprimindo e salvando Bdd
+print = Cudd_BddToAdd(gbm,sEG);
 
 print_dd(gbm, print, 8,4);
 sprintf(filename, "bdd/graph.dot");

@@ -5,14 +5,48 @@ edge [dir = none];
 { node [shape = plaintext];
   edge [style = invis];
   "CONST NODES" [style = invis];
-"CONST NODES"; 
+" 0 " -> " 2 " -> " 4 " -> " 6 " -> "CONST NODES"; 
 }
 { rank = same; node [shape = box]; edge [style = invis];
 "F0"; }
+{ rank = same; " 0 ";
+"0x3a7";
+}
+{ rank = same; " 2 ";
+"0x3a1";
+"0x3a6";
+}
+{ rank = same; " 4 ";
+"0x39f";
+"0x3a0";
+"0x3a5";
+}
+{ rank = same; " 6 ";
+"0x39b";
+"0x39a";
+}
 { rank = same; "CONST NODES";
-{ node [shape = box]; "0";
+{ node [shape = box]; "0x1ba";
+"0x1b9";
 }
 }
-"F0" -> "0" [style = solid];
-"0" [label = "1"];
+"F0" -> "0x3a7" [style = solid];
+"0x3a7" -> "0x3a6";
+"0x3a7" -> "0x3a1" [style = dashed];
+"0x3a1" -> "0x39f";
+"0x3a1" -> "0x3a0" [style = dashed];
+"0x3a6" -> "0x3a0";
+"0x3a6" -> "0x3a5" [style = dashed];
+"0x39f" -> "0x1b9";
+"0x39f" -> "0x39b" [style = dashed];
+"0x3a0" -> "0x39b";
+"0x3a0" -> "0x39a" [style = dashed];
+"0x3a5" -> "0x39b";
+"0x3a5" -> "0x1ba" [style = dashed];
+"0x39b" -> "0x1ba";
+"0x39b" -> "0x1b9" [style = dashed];
+"0x39a" -> "0x1b9";
+"0x39a" -> "0x1ba" [style = dashed];
+"0x1ba" [label = "0"];
+"0x1b9" [label = "1"];
 }

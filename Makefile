@@ -1,7 +1,7 @@
 CFLAGS = -I  cudd-3.0.0 cudd-3.0.0/cudd -I cudd-3.0.0/util -I /cudd-3.0.0
 LFLAGS = -static -L cudd-3.0.0/cudd/.libs/ -lcudd -lm
 
-teste = transitions04
+teste = satFinal
 ext =  cpp
 comp = g++ -std=c++11
 default:	testprogram

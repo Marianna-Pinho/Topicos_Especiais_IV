@@ -242,9 +242,10 @@ char ** stringToChar(vector<string> words){
   }
 }
 
-DdNode *pre_Fraca(DdNode* Xddl, DdNode* Tdd){
+DdNode *pre_Fraca(DdNode* Xdd, DdNode* Tdd, int *permutation){
 	int i = 0;
-	DdNode *XTdd, *preFraca;
+	DdNode *XTdd, *preFraca, *Xddl;
+	Xddl = Cudd_bddPermute(gbm, Xdd, permutation); 
 
 	XTdd = Cudd_bddAnd(gbm, Xddl, Tdd);
     preFraca = XTdd;
@@ -261,21 +262,41 @@ DdNode *pre_Fraca(DdNode* Xddl, DdNode* Tdd){
     }
     return preFraca;
 }
-
+//pre ∀ (X) = S − pre ∃ (S − X)
 DdNode *pre_Forte(DdNode* Sdd, DdNode* Xdd, DdNode* Tdd, int *permutation){
-	DdNode *firstInt, *firstIntL, *secondInt;  
-	firstInt = Cudd_bddIntersect(gbm, Sdd, Cudd_Not(Xdd));
-    firstIntL = Cudd_bddPermute(gbm, firstInt, permutation); 
-    if(firstIntL == NULL){
-        printf("Permute failed\n");
-    }
-    secondInt = Cudd_bddIntersect(gbm, Sdd, Cudd_Not(pre_Fraca(firstIntL, Tdd)));
+	DdNode *firstInt, *secondInt;  
+	firstInt = Cudd_bddAnd(gbm, Sdd, Cudd_Not(Xdd));
+
+	DdNode *print = Cudd_BddToAdd(gbm, pre_Fraca(firstInt, Tdd, permutation));
+    print_dd(gbm, print, 8,4);
+
+    secondInt = Cudd_bddAnd(gbm, Sdd, Cudd_Not(pre_Fraca(firstInt, Tdd, permutation)));
     return secondInt;
 }
+
+DdNode *satEG(DdNode *phi, DdNode *Sdd, DdNode *Tdd, int *permutation){
+	DdNode *x = Sdd;
+	DdNode *y = phi;
+	DdNode *print, *aux;
+
+
+	while(x != y){
+		x = y;
+		aux = pre_Fraca(y, Tdd, permutation);
+		y = Cudd_bddAnd(gbm, y, pre_Fraca(y, Tdd, permutation));
+	}
+	return y;	
+}
+
+DdNode *satAx(DdNode *phi, DdNode *Sdd, DdNode *Tdd, int *permutation){
+	return pre_Forte(Sdd, phi, Tdd, permutation);
+}
+
 int main(){
  
     char filename[100];
-    DdNode *Xdd,*Tdd, *print, *restrictBy, *restrictNot, *restrictF, *XTdd, *preFraca, *Xddl, *preForte;
+    DdNode *Xdd,*Tdd, *print, *restrictBy, *restrictNot, *restrictF, *XTdd, *preFraca, *Xddl, *preForte,
+    		*sEG, *sAX;
     gbm = Cudd_Init(0,0,CUDD_UNIQUE_SLOTS,CUDD_CACHE_SLOTS,0);
     int i = 0;
  
@@ -318,35 +339,49 @@ int main(){
     //     }
     // }
 
+/* *************** Exemplos ****************** */
+       DdNode * entrada = prop["q"];
+       //DdNode * entrada = Cudd_Not(prop["r"]);
+
+       //entrada = Cudd_bddAnd(gbm, entrada, prop["q"]);
+      // entrada = Cudd_bddAnd(gbm, entrada, Cudd_Not(prop["q"]));
+      // entrada = Cudd_bddOr(gbm, entrada, prop["q"]);
+       //entrada = Cudd_bddOr(gbm, entrada, Cudd_Not(prop["q"]));
+
+       //entrada = Cudd_bddAnd(gbm, entrada, prop["r"]);
+      // entrada = Cudd_bddAnd(gbm, entrada, Cudd_Not(prop["r"]));
+       //entrada = Cudd_bddOr(gbm, entrada, prop["r"]);
+       //entrada = Cudd_bddOr(gbm, entrada, Cudd_Not(prop["r"]));
+
+       //entrada = Cudd_bddAnd(gbm, entrada, prop["s"]);
+       //entrada = Cudd_bddAnd(gbm, entrada, Cudd_Not(prop["s"]));
+       //entrada = Cudd_bddOr(gbm, entrada, prop["s"]);
+       //entrada = Cudd_bddOr(gbm, entrada, Cudd_Not(prop["s"]));
+
 /* ************************ Creating X'dd *************** */
-    Xddl = Cudd_bddPermute(gbm, states["s5"], permutation); 
+    Xddl = Cudd_bddPermute(gbm, states["s8"], permutation); 
        if(Xddl == NULL){
             printf("Permute failed\n");
        }
-
-/* ******************* Applying EX ********************** */
-       preFraca = pre_Fraca(Xddl, Tdd);
+/* ******************* Applying preFraca ********************** */
+       preFraca = pre_Fraca(states["s8"], Tdd, permutation);
   
- /* ******************Doing preForte**************** */
-       preForte = pre_Forte(Xdd, states["s7"], Tdd, permutation);
+ /* ******************Applying preForte**************** */
+      // preForte = pre_Forte(Xdd,Cudd_bddOr(gbm, states["s11"], states["s12"]), Tdd, permutation);
        
-        // DdNode* firstInt = Cudd_bddIntersect(gbm, Xdd, Cudd_Not(states["s7"]));
-        // Xddl = Cudd_bddPermute(gbm, firstInt, permutation); 
-       	// if(Xddl == NULL){
-        //     printf("Permute failed\n");
-       	// }
-        // DdNode* secondInt = Cudd_bddIntersect(gbm, Xdd, Cudd_Not(pre_Fraca(Xddl, Tdd)));
-  /* **************** Saving Bdd *************** */
+ /* **************** Saving Bdd *************** */
     // i = 0;
     // char *nome[prop.size()];
     // for(i = 0; i < prop.size(); i++){
     //     strcpy(nome[i],);
     // }
-    print = Cudd_BddToAdd(gbm,preForte);
+    //sEG = satEG(entrada, Xdd, Tdd, permutation);
+    sAX = satAx(entrada, Xdd, Tdd, permutation);
+  //  print = Cudd_BddToAdd(gbm,sAX);
 
-    print_dd(gbm, print, 8,4);
+    //print_dd(gbm, print, 8,4);
     sprintf(filename, "bdd/graph.dot");
-    write_dd(gbm, print, filename);
+    //write_dd(gbm, print, filename);
     Cudd_Quit(gbm);
  
      return 0;
